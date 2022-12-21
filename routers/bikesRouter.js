@@ -3,7 +3,7 @@ const express = require('express')
 
 const router = express.Router()
 
-const Note = require("../models/notesModel");   
+const Bike = require("../models/bikesModel");   
 
 router.use(function (req, res, next){
     if (req.accepts('json')) {
@@ -14,7 +14,7 @@ router.use(function (req, res, next){
 });
 router.get('/', async (req, res) => {
     console.log('GET')
-    let total = await Note.countDocuments()
+    let total = await Bike.countDocuments()
     let start = parseInt(req.query.start)
     let limit = parseInt(req.query.limit) 
 
@@ -24,16 +24,16 @@ router.get('/', async (req, res) => {
 
 
     try {
-        let notes = await Note.find()
+        let bikes = await Bike.find()
         .skip(start - 1)
         .limit(limit)
     //create representation for collection as requested in assignment 
     //items, _links, paginations
-    let notesCollection = {
-        items: notes || {}, 
+    let bikesCollection = {
+        items: bikes, 
         _links:{
             self:{
-                href:`${process.env.BASE_URL}notes/`
+                href:`${process.env.BASE_URL}/`
             },
         }, 
         pagination: { 
@@ -44,25 +44,25 @@ router.get('/', async (req, res) => {
             _links : {
                 first:{
                     page: 1,
-                    href:`${process.env.BASE_URL}notes?start=1&limit=${limit}`  
+                    href:`${process.env.BASE_URL}?start=1&limit=${limit}`  
                 },
                 previous:{
                     page: Math.ceil(start/limit) - 1,
-                    href:`${process.env.BASE_URL}notes?start=${start - 1}&limit=${limit}`
+                    href:`${process.env.BASE_URL}?start=${start - 1}&limit=${limit}`
                 },
                 next:{
                     page: Math.ceil(start/limit) + 1,
-                    href:`${process.env.BASE_URL}notes?start=${start + 1}&limit=${limit}`
+                    href:`${process.env.BASE_URL}?start=${start + 1}&limit=${limit}`
                 },
                 last:{
                     page: Math.ceil(total / limit),
-                    href:`${process.env.BASE_URL}notes?start=${Math.ceil(total / limit)}&limit=${limit}`
+                    href:`${process.env.BASE_URL}?start=${Math.ceil(total / limit)}&limit=${limit}`
                 },
             }
         },
     }
         res.json(
-            notesCollection,
+            bikesCollection,
           )    
     }catch{
         res.status(500).send()
@@ -75,11 +75,11 @@ router.get('/:id', async (req, res) => {
     console.log(`GET request for detail ${req.params.id}`)
 
     try {
-        let note = await Note.findById(req.params.id)
-        if (note == null){
+        let bike = await Bike.findById(req.params.id)
+        if (bike == null){
             res.status(404).send()
         }else{
-            res.json(note)
+            res.json(bike)
         }
     } catch{
         res.status(404).send
@@ -112,16 +112,16 @@ router.post('/', (req, res, next) => {
 
 router.post('/', async (req, res) => {
     console.log('POST')
-    let note = new Note({
+    let bike = new Bike({
         title: req.body.title,
         body: req.body.body,
         author: req.body.author,
     })
 
     try {
-        await note.save()
+        await bike.save()
         res.status(201).send()
-        res.json(note)
+        res.json(bike)
     }catch{
         res.status(500).send()
     }
@@ -142,22 +142,22 @@ router.put('/:id', (req, res, next) => {
 router.put('/:id', async function(req,res,next){
     console.log(`PUT request for detail ${req.params.id}`)
     try{
-        let note = await Note.findById(req.params.id)
+        let bike = await Bike.findById(req.params.id)
 
-        if(!note){
+        if(!bike){
             return res.json({
-                message:"Note ID does not exist",
+                message:"Bike ID does not exist",
             });
         } else{
-            console.log('Note Updated')
-            let noteUpdate = await Note.findByIdAndUpdate(req.params.id, req.body,{
+            console.log('Bike Updated')
+            let bikeUpdate = await Bike.findByIdAndUpdate(req.params.id, req.body,{
                 new:true,
                 runValidator:true
             });
 
             res.json({
-                message: "Note updated successflly.",
-                note: noteUpdate
+                message: "Bike updated successflly.",
+                bike: bikeUpdate
             })
         }
     }catch(error){
@@ -169,8 +169,8 @@ router.put('/:id', async function(req,res,next){
   
 router.delete("/:id", async (req, res) => {
     try {
-        let note = await Note.findByIdAndDelete(req.params.id);
-        if(note === null){
+        let bike = await Bike.findByIdAndDelete(req.params.id);
+        if(bike === null){
             res.status(404).send();
         }
         res.status(204).send();

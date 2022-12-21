@@ -16,7 +16,7 @@ const mongoose = require("mongoose");
 mongoose.set('strictQuery', false);
 
 // Set up default mongoose connection
-const mongoDB = "mongodb://127.0.0.1/notes";
+const mongoDB = "mongodb://127.0.0.1/bikes";
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
 // Get the default connection
@@ -25,7 +25,7 @@ const db = mongoose.connection;
 // Bind connection to error event (to get notification of connection errors)
 db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-const notesRouter = require('./routers/notesRouter');
+const bikesRouter = require('./routers/bikesRouter');
 
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json({type:'application/json'}))
@@ -44,7 +44,7 @@ app.use(function (req, res, next) {
 
 
 
-app.use('/notes/', notesRouter);
+app.use('/', bikesRouter);
 
 app.listen(port, () => {
 
